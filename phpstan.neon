@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+    paths:
+        - src/
+
+    excludePaths:
+        - '*.tpl.php'
+        - 'tests/Support/_generated/*'
+        - 'tests/Unit/*/Stub/*'
+
