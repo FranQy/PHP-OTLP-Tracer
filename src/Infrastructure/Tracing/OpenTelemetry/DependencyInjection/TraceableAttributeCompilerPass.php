@@ -7,6 +7,7 @@ namespace Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\DependencyInject
 use Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\Attribute\Traceable;
 use Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\TraceableMethodsMap\TraceableMethod;
 use Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\TraceableMethodsMap\TraceableMethodsMap;
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -25,7 +26,7 @@ class TraceableAttributeCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $reflectionClass = new \ReflectionClass($class);
+            $reflectionClass = new ReflectionClass($class);
             foreach ($reflectionClass->getMethods() as $method) {
                 $attributes = $method->getAttributes(Traceable::class);
 
@@ -46,7 +47,7 @@ class TraceableAttributeCompilerPass implements CompilerPassInterface
                             $attribute->spanName ?? ($class . self::NAMESPACE_SEPARATOR . $method->name),
                             $attribute->traceParams,
                             $paramsNames,
-                            $attribute->kind
+                            $attribute->kind,
                         ]
                     );
                      $inlineTraceable->setShared(false);

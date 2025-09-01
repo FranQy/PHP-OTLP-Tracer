@@ -16,11 +16,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Throwable;
+
 use function OpenTelemetry\Instrumentation\hook;
 
 class ConfigureTracingKernelEventSubscriber implements EventSubscriberInterface
 {
     private const ATTRIBUTE_FUNCTION_PARAMS = 'code.function.params';
+
     private const INSTRUMENTATION_NAME = 'com.jaebestudio.php.symfony';
 
     /**
@@ -30,10 +32,11 @@ class ConfigureTracingKernelEventSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private TraceableMethodsMap $traceableMethodsMap,
-         #[Autowire('@open_telemetry.traces.default_tracer')] ?TracerInterface $tracer=null, // try to load friendsofopentelemetry/opentelemetry-bundle default tracer if available
-    )
-    {
-        $this->tracer = $tracer ?? (new CachedInstrumentation(self::INSTRUMENTATION_NAME))->tracer(); // fallback to OpenTelemetry zero-code instrumentation tracer
+        // try to load friendsofopentelemetry/opentelemetry-bundle default tracer if available
+        #[Autowire('@open_telemetry.traces.default_tracer')] ?TracerInterface $tracer = null,
+    ) {
+        // fallback to OpenTelemetry zero-code instrumentation tracer
+        $this->tracer = $tracer ?? (new CachedInstrumentation(self::INSTRUMENTATION_NAME))->tracer();
     }
 
     public static function getSubscribedEvents()
@@ -46,9 +49,7 @@ class ConfigureTracingKernelEventSubscriber implements EventSubscriberInterface
 
     public function configureTracing(): void
     {
-
-
-$tracer = $this->tracer;
+        $tracer = $this->tracer;
         foreach ($this->traceableMethodsMap as $methodDetails) {
             hook(
                 class: $methodDetails->className,
@@ -60,7 +61,10 @@ $tracer = $this->tracer;
                     ?string $function,
                     ?string $filename,
                     ?int $lineno
-                ) use ($tracer, $methodDetails) {
+                ) use (
+                    $tracer,
+                    $methodDetails
+                ) {
                     $span = self::builder($tracer, $methodDetails, $params, $function, $class, $filename, $lineno)
                         ->startSpan();
                     Context::storage()->attach($span->storeInContext(Context::getCurrent()));
@@ -72,14 +76,24 @@ $tracer = $this->tracer;
         }
     }
 
+    /**
+     * @param \OpenTelemetry\API\Trace\TracerInterface $tracer
+     * @param \Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\TraceableMethodsMap\TraceableMethod $methodDetails
+     * @param array<int,string>|null $params
+     * @param string|null $method
+     * @param string|null $class
+     * @param string|null $filename
+     * @param int|null $lineno
+     * @return \OpenTelemetry\API\Trace\SpanBuilderInterface
+     */
     private static function builder(
-        TracerInterface      $tracer,
-        TraceableMethod       $methodDetails,
-        ?array                $params,
-        ?string               $method,
-        ?string               $class,
-        ?string               $filename,
-        ?int                  $lineno,
+        TracerInterface $tracer,
+        TraceableMethod $methodDetails,
+        ?array $params,
+        ?string $method,
+        ?string $class,
+        ?string $filename,
+        ?int $lineno,
     ): SpanBuilderInterface {
         $params = $methodDetails->shouldTraceParams ? $params : null;
         $tracer = $tracer

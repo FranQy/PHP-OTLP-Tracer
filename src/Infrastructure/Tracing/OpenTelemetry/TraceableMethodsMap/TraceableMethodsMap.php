@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Jaebe\OtlpTracer\Infrastructure\Tracing\OpenTelemetry\TraceableMethodsMap;
 
+use Iterator;
 
 /**
  * @implements \Iterator<int, TraceableMethod>
  */
-class TraceableMethodsMap implements \Iterator
+class TraceableMethodsMap implements Iterator
 {
+    /**
+     * @var array <int, TraceableMethod>
+     */
     private array $map = [];
 
     public function addMethod(TraceableMethod $method): void

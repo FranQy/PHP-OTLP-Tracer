@@ -9,10 +9,9 @@ use OpenTelemetry\API\Trace\SpanKind;
 class Traceable
 {
     public function __construct(
-        public readonly ?string $spanName=null,
-        public readonly bool $traceParams=false,
+        public readonly ?string $spanName = null,
+        public readonly bool $traceParams = false,
         public readonly int $kind = SpanKind::KIND_INTERNAL
-    )
-    {
+    ) {
     }
 }

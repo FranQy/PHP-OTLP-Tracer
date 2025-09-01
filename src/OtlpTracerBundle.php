@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class OtlpTracerBundle extends AbstractBundle
 {
-
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
