@@ -1,5 +1,5 @@
 {
-  "name": "jaebe/otlp-tracer",
+  "name": "jaebe/symfony-otlp-tracer",
   "description": "Symfony bundle to allow tracing any method with OpenTelemetry",
   "type": "symfony-bundle",
   "prefer-stable": true,
